@@ -24,6 +24,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     implementation("io.micrometer:micrometer-core:1.7.0")
     implementation("io.micrometer:micrometer-registry-prometheus:latest.release")

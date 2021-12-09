@@ -6,11 +6,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 public class CustomUserDetails implements UserDetails {
-    private String login;
+    private String id;
     private String password;
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setPassword(String password) {
@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return id;
     }
 
     @Override

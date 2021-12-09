@@ -2,6 +2,7 @@ package com.trkpo.course.controller;
 
 import com.trkpo.course.converter.UserConverter;
 import com.trkpo.course.dto.UserDTO;
+import com.trkpo.course.entity.CustomUserDetails;
 import com.trkpo.course.entity.User;
 import com.trkpo.course.repository.CredentialRepository;
 import com.trkpo.course.repository.PostRepository;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/api")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
@@ -95,7 +97,7 @@ public class UserController {
 
 
     private User getUserFromContext() {
-        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.getById(Long.valueOf(userId));
+        String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.getById(Long.valueOf(id));
     }
 }

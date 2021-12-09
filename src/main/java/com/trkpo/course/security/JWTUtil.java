@@ -4,14 +4,24 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Component
 public class JWTUtil {
-    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static JWTConfiguration jwtConfiguration;
+
+    @Autowired
+    private JWTUtil(JWTConfiguration jwtConfiguration) {
+        JWTUtil.jwtConfiguration = jwtConfiguration;
+    }
 
     public static String extractId(String token){
         return extractClaim(token, Claims::getSubject);
@@ -22,7 +32,8 @@ public class JWTUtil {
         return claimsResolver.apply(claims);
     }
     private static Claims extractAllClaims(String token){
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        SecretKey secretKey = new SecretKeySpec(jwtConfiguration.getKey().getBytes(), 0, jwtConfiguration.getKey().length(), "HmacSHA256");
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
 
@@ -32,7 +43,8 @@ public class JWTUtil {
         return createToken(claims, "1");
     }
     public static String createToken(Map<String, Object> claims, String subject) {
+        SecretKey secretKey = new SecretKeySpec(jwtConfiguration.getKey().getBytes(), 0, jwtConfiguration.getKey().length(), "HmacSHA256");
         return Jwts.builder().setClaims(claims).setSubject(subject)
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+                .signWith(SignatureAlgorithm.HS256, secretKey).compact();
     }
 }

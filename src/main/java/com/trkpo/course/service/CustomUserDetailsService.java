@@ -2,7 +2,6 @@ package com.trkpo.course.service;
 
 import com.trkpo.course.entity.Credentials;
 import com.trkpo.course.entity.CustomUserDetails;
-import com.trkpo.course.entity.User;
 import com.trkpo.course.repository.CredentialRepository;
 import com.trkpo.course.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     private CredentialRepository credentialRepository;
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        Optional<Credentials> credentials = credentialRepository.findByUserId(Long.valueOf(userId));
+        Optional<Credentials> credentials = credentialRepository.findById(Long.valueOf(userId));
         if (credentials.isPresent()) {
             CustomUserDetails userDetails = new CustomUserDetails();
-            userDetails.setLogin(credentials.get().getLogin());
+            userDetails.setId(credentials.get().getUser().getId().toString());
             userDetails.setPassword(credentials.get().getPassword());
             return userDetails;
         } else {
