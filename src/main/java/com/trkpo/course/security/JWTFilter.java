@@ -3,6 +3,7 @@ package com.trkpo.course.security;
 import com.trkpo.course.service.CustomUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,8 +31,9 @@ public class JWTFilter extends OncePerRequestFilter {
         }
         System.out.println("USER ID :" + userId);
         if (userId != null) {
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(userId, customUserDetailsService.loadUserByUsername(userId).getPassword());
+                    new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
         chain.doFilter(request, response);

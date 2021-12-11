@@ -3,6 +3,7 @@ package com.trkpo.course.entity;
 import javax.persistence.*;
 
 @Entity(name = "Post")
+@Table(name = "Posts")
 public class Post {
     @Id
     @GeneratedValue

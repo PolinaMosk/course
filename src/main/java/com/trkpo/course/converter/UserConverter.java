@@ -21,7 +21,7 @@ public class UserConverter {
     public UserDTO convertUserEntityToDTO(User userEntity) {
         UserDTO userDTO = new UserDTO();
         Optional<Credentials> credentials = credentialRepository.findByUserId(userEntity.getId());
-        userDTO.setEmail(userEntity.getEmail());
+        userDTO.setEmail(credentials.get().getEmail());
         userDTO.setLogin(credentials.get().getLogin());
         userDTO.setName(userEntity.getName());
         if (userEntity.getPicture() != null) userDTO.setPictureId(userEntity.getPicture().getId());
@@ -37,6 +37,9 @@ public class UserConverter {
             }
             if (userDTO.getPassword() != null) {
                 principalCredentials.get().setPassword(userDTO.getPassword());
+            }
+            if (userDTO.getEmail() != null) {
+                principalCredentials.get().setEmail(userDTO.getEmail());
             }
             credentialRepository.save(principalCredentials.get());
         }

@@ -8,14 +8,17 @@ public class Credentials {
     @GeneratedValue
     private Long id;
     private String login;
+    @Column(name = "password_hash")
     private String password;
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+    private String email;
 
-    public Credentials(String login, String password) {
+    public Credentials(String login, String password, String email) {
         this.login = login;
         this.password = password;
+        this.email = email;
     }
 
     public Credentials() {
@@ -43,5 +46,13 @@ public class Credentials {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

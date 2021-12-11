@@ -3,7 +3,8 @@ package com.trkpo.course.entity;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity(name = "blogUser")
+@Entity(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue
@@ -13,8 +14,11 @@ public class User {
     @JoinColumn(name = "picture_id")
     private Picture picture;
     @ManyToMany
+    @JoinTable(
+            joinColumns= @JoinColumn(name="user_id"),
+            inverseJoinColumns=@JoinColumn(name="favourite_id")
+    )
     private List<User> favourites;
-    private String email;
 
     public User(String name, String email, Picture picture) {
         this.name = name;
@@ -54,13 +58,5 @@ public class User {
 
     public void setFavourites(List<User> favourites) {
         this.favourites = favourites;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }
