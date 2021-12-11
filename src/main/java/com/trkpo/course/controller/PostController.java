@@ -1,5 +1,6 @@
 package com.trkpo.course.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.trkpo.course.converter.PostConverter;
 import com.trkpo.course.dto.PostDTO;
 import com.trkpo.course.entity.Post;
@@ -24,34 +25,40 @@ public class PostController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private PictureRepository pictureRepository;
-    @Autowired
     private PostService postService;
     @Autowired
     private PostConverter postConverter;
 
     @PostMapping("/v1/post")
     public ResponseEntity<?> createPost(@RequestBody PostDTO post) {
-        Post newPost = postConverter.convertPostDTOtoEntity(post, getUserFromContext());
-        return ResponseEntity.ok(postConverter.convertPostEntityToDTO(postRepository.save(newPost)));
+        try {
+            Post newPost = postConverter.convertPostDTOtoEntity(post, getUserFromContext());
+            return ResponseEntity.ok(postConverter.convertPostEntityToDTO(postRepository.save(newPost)));
+        } catch (JsonProcessingException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PutMapping("/v1/post/{id}")
     public ResponseEntity<?> editPost(@PathVariable Long id, @RequestBody PostDTO post) {
         Optional<Post> postToEdit = postRepository.findById(id);
         if (postToEdit.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        postService.editPost(postToEdit.get(), post);
-        return ResponseEntity.ok(postConverter.convertPostEntityToDTO(postRepository.save(postToEdit.get())));
+        try {
+            postService.editPost(postToEdit.get(), post);
+            return ResponseEntity.ok(postConverter.convertPostEntityToDTO(postRepository.save(postToEdit.get())));
+        } catch (JsonProcessingException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @DeleteMapping("/v1/post/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Long id) {
-        if (pictureRepository.findById(id).isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        pictureRepository.deleteById(id);
+        if (postRepository.findById(id).isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        postRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
-    private User getUserFromContext(){
+    private User getUserFromContext() {
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.getById(Long.valueOf(userId));
     }

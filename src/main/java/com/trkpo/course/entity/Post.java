@@ -15,7 +15,7 @@ public class Post {
     private Picture picture;
     private Long dateTime;
     private boolean isPrivate;
-    private String spanJson;
+    private String span;
 
     public Post() {
     }
@@ -68,11 +68,11 @@ public class Post {
         isPrivate = aPrivate;
     }
 
-    public String getSpanJson() {
-        return spanJson;
+    public String getSpan() {
+        return span;
     }
 
-    public void setSpanJson(String spanJson) {
-        this.spanJson = spanJson;
+    public void setSpan(String span) {
+        this.span = span;
     }
 }
