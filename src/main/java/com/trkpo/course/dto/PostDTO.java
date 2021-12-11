@@ -1,10 +1,11 @@
 package com.trkpo.course.dto;
+import java.util.List;
 
 public class PostDTO {
     private Long id;
     private Long userId;
     private String text;
-    private String spanJson;
+    private List<SpanDTO> span;
     private boolean isPrivate;
     private Long dateTime;
     private Long pictureId;
@@ -33,14 +34,6 @@ public class PostDTO {
         this.text = text;
     }
 
-    public String getSpanJson() {
-        return spanJson;
-    }
-
-    public void setSpanJson(String spanJson) {
-        this.spanJson = spanJson;
-    }
-
     public boolean isPrivate() {
         return isPrivate;
     }
@@ -63,5 +56,13 @@ public class PostDTO {
 
     public void setPictureId(Long pictureId) {
         this.pictureId = pictureId;
+    }
+
+    public List<SpanDTO> getSpan() {
+        return span;
+    }
+
+    public void setSpan(List<SpanDTO> span) {
+        this.span = span;
     }
 }

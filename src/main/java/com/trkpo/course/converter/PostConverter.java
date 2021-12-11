@@ -1,6 +1,10 @@
 package com.trkpo.course.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trkpo.course.dto.PostDTO;
+import com.trkpo.course.dto.SpanDTO;
 import com.trkpo.course.entity.Picture;
 import com.trkpo.course.entity.Post;
 import com.trkpo.course.entity.User;
@@ -8,14 +12,17 @@ import com.trkpo.course.repository.PictureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
 public class PostConverter {
     @Autowired
     private PictureRepository pictureRepository;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    public Post convertPostDTOtoEntity(PostDTO post, User user) {
+    public Post convertPostDTOtoEntity(PostDTO post, User user) throws JsonProcessingException {
         Post newPost = new Post();
         if (post.getPictureId() != null) {
             Optional<Picture> pic = pictureRepository.findById(post.getPictureId());
@@ -25,16 +32,21 @@ public class PostConverter {
         newPost.setDateTime(post.getDateTime());
         newPost.setPrivate(post.isPrivate());
         newPost.setText(post.getText());
-        newPost.setSpanJson(post.getSpanJson());
+        newPost.setSpan(objectMapper.writeValueAsString(post.getSpan()));
         return newPost;
     }
 
-    public PostDTO convertPostEntityToDTO(Post post) {
+    public PostDTO convertPostEntityToDTO(Post post) throws JsonProcessingException {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(post.getId());
         postDTO.setDateTime(post.getDateTime());
         postDTO.setPrivate(post.isPrivate());
-        postDTO.setSpanJson(post.getSpanJson());
+        JsonNode jsonSpan = objectMapper.readTree(post.getSpan());
+        List<SpanDTO> spanDTOList = new ArrayList<>();
+        for (int i = 0; i < jsonSpan.size(); i++) {
+            spanDTOList.add(objectMapper.treeToValue(jsonSpan.get(i), SpanDTO.class));
+        }
+        postDTO.setSpan(spanDTOList);
         postDTO.setUserId(post.getUser().getId());
         postDTO.setText(post.getText());
         if (post.getPicture() != null) {

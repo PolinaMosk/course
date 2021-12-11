@@ -1,9 +1,10 @@
 package com.trkpo.course.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.trkpo.course.converter.UserConverter;
 import com.trkpo.course.dto.UserDTO;
-import com.trkpo.course.entity.CustomUserDetails;
 import com.trkpo.course.entity.User;
+import com.trkpo.course.exception.InvalidPasswordException;
 import com.trkpo.course.repository.CredentialRepository;
 import com.trkpo.course.repository.PostRepository;
 import com.trkpo.course.repository.UserRepository;
@@ -37,9 +38,8 @@ public class UserController {
     private UserConverter userConverter;
 
     @PutMapping("/v1/user")
-    public ResponseEntity<?> edit(@RequestBody UserDTO userDTO) {
-        User user = userConverter.convertUserDTOToEntity(userDTO, getUserFromContext());
-        return ResponseEntity.ok(userConverter.convertUserEntityToDTO(userRepository.save(user)));
+    public ResponseEntity<?> edit(@RequestBody UserDTO userDTO) throws InvalidPasswordException {
+        return ResponseEntity.ok(userService.editUser(userDTO, getUserFromContext()));
     }
 
     @GetMapping("/v1/user")
@@ -54,14 +54,14 @@ public class UserController {
         return ResponseEntity.ok(userConverter.convertUserEntityToDTO(user.get()));
     }
 
-    @GetMapping("/v1/user/favourites")
+    @GetMapping("/v1/user/favorites")
     public ResponseEntity<?> getUserFavourites() {
         User user = userRepository.getById(getUserFromContext().getId());
         List<User> favourite = user.getFavourites();
         return ResponseEntity.ok().body(favourite.stream().map(it -> userConverter.convertUserEntityToDTO(it)).collect(Collectors.toList()));
     }
 
-    @PostMapping("/v1/user/favourites/{id}")
+    @PostMapping("/v1/user/favorites/{id}")
     public ResponseEntity<?> addUserFavourites(@PathVariable Long id) {
         if (userService.addFavourites(id, getUserFromContext())) {
             return ResponseEntity.ok().build();
@@ -73,12 +73,29 @@ public class UserController {
     @GetMapping("/v1/user/news")
     public ResponseEntity<?> getNews() {
         User user = getUserFromContext();
-        return ResponseEntity.ok().body(postService.getNews(user));
+        try {
+            return ResponseEntity.ok().body(postService.getNews(user));
+        } catch (JsonProcessingException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/v1/user/posts")
     public ResponseEntity<?> getPosts() {
-        return ResponseEntity.ok().body(postService.getPosts(getUserFromContext()));
+        try {
+            return ResponseEntity.ok().body(postService.getPosts(getUserFromContext()));
+        } catch (JsonProcessingException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/v1/users/{id}/posts")
+    public ResponseEntity<?> getPostsByUserId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok().body(postService.getPosts(userRepository.getById(id)));
+        } catch (JsonProcessingException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @Transactional
@@ -90,14 +107,29 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/v1/search/users")
-    public ResponseEntity<?> searchUser() {
+    @GetMapping("/v1/users")
+    public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok().body(userRepository.findAll().stream().map(it -> userConverter.convertUserEntityToDTO(it)).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/v1/search/{info}")
+    public ResponseEntity<?> searchUser(@PathVariable String info) {
+        return ResponseEntity.ok().body(userService.search(info));
+    }
+
+    @GetMapping("/v1/user/isFavorite/{id}")
+    public ResponseEntity<?> isFavorite(@PathVariable Long id) {
+        return ResponseEntity.ok().body(userService.isFavorite(id, getUserFromContext()));
     }
 
 
     private User getUserFromContext() {
         String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.getById(Long.valueOf(id));
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<?> handleInvalidPasswordException(InvalidPasswordException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
     }
 }
