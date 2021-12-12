@@ -62,8 +62,17 @@ public class UserController {
     }
 
     @PostMapping("/v1/user/favorites/{id}")
-    public ResponseEntity<?> addUserFavourites(@PathVariable Long id) {
-        if (userService.addFavourites(id, getUserFromContext())) {
+    public ResponseEntity<?> addUserFavorites(@PathVariable Long id) {
+        if (userService.addFavorites(id, getUserFromContext())) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @DeleteMapping("/v1/user/favorites/{id}")
+    public ResponseEntity<?> deleteUserFavorites(@PathVariable Long id) {
+        if (userService.deleteFavorites(id, getUserFromContext())) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -121,7 +130,6 @@ public class UserController {
     public ResponseEntity<?> isFavorite(@PathVariable Long id) {
         return ResponseEntity.ok().body(userService.isFavorite(id, getUserFromContext()));
     }
-
 
     private User getUserFromContext() {
         String id = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

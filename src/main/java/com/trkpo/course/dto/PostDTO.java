@@ -1,8 +1,9 @@
 package com.trkpo.course.dto;
+
 import java.util.List;
 
 public class PostDTO {
-    private Long id;
+    private UserDTO userDTO;
     private Long userId;
     private String text;
     private List<SpanDTO> span;
@@ -10,12 +11,12 @@ public class PostDTO {
     private Long dateTime;
     private Long pictureId;
 
-    public Long getId() {
-        return id;
+    public UserDTO getUserDTO() {
+        return userDTO;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserDTO(UserDTO userDTO) {
+        this.userDTO = userDTO;
     }
 
     public Long getUserId() {
