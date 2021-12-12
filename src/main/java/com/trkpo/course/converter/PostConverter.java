@@ -9,6 +9,7 @@ import com.trkpo.course.entity.Picture;
 import com.trkpo.course.entity.Post;
 import com.trkpo.course.entity.User;
 import com.trkpo.course.repository.PictureRepository;
+import com.trkpo.course.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,10 @@ import java.util.Optional;
 public class PostConverter {
     @Autowired
     private PictureRepository pictureRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserConverter userConverter;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public Post convertPostDTOtoEntity(PostDTO post, User user) throws JsonProcessingException {
@@ -38,7 +43,8 @@ public class PostConverter {
 
     public PostDTO convertPostEntityToDTO(Post post) throws JsonProcessingException {
         PostDTO postDTO = new PostDTO();
-        postDTO.setId(post.getId());
+        User user = post.getUser();
+        postDTO.setUserDTO(userConverter.convertUserEntityToDTO(user));
         postDTO.setDateTime(post.getDateTime());
         postDTO.setPrivate(post.isPrivate());
         JsonNode jsonSpan = objectMapper.readTree(post.getSpan());

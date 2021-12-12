@@ -5,7 +5,6 @@ import com.trkpo.course.converter.PostConverter;
 import com.trkpo.course.dto.PostDTO;
 import com.trkpo.course.entity.Post;
 import com.trkpo.course.entity.User;
-import com.trkpo.course.repository.PictureRepository;
 import com.trkpo.course.repository.PostRepository;
 import com.trkpo.course.repository.UserRepository;
 import com.trkpo.course.service.PostService;

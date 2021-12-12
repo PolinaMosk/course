@@ -34,7 +34,7 @@ public class UserService {
     private UserConverter userConverter;
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public boolean addFavourites(Long id, User user) {
+    public boolean addFavorites(Long id, User user) {
         Optional<User> favouriteUser = userRepository.findById(id);
         if (favouriteUser.isEmpty()) return false;
         user.getFavourites().add(favouriteUser.get());
@@ -96,5 +96,16 @@ public class UserService {
     public boolean isFavorite(Long id, User currentUser) {
         User user = userRepository.getById(id);
         return currentUser.getFavourites().contains(user);
+    }
+
+    public boolean deleteFavorites(Long id, User user) {
+        Optional<User> favouriteUser = userRepository.findById(id);
+        if (favouriteUser.isEmpty()) return false;
+        if (!user.getFavourites().contains(favouriteUser.get())) {
+            return false;
+        }
+        user.getFavourites().remove(favouriteUser.get());
+        userRepository.save(user);
+        return true;
     }
 }
