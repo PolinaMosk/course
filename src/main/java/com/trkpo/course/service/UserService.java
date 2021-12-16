@@ -88,6 +88,8 @@ public class UserService {
         if (userDTO.getPictureId() != null) {
             Optional<Picture> picture = pictureRepository.findById(userDTO.getPictureId());
             picture.ifPresent(userToEdit::setPicture);
+        } else {
+            userToEdit.setPicture(null);
         }
         userRepository.save(userToEdit);
         return userConverter.convertUserEntityToDTO(userToEdit);
