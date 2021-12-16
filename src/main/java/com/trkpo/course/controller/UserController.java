@@ -118,7 +118,9 @@ public class UserController {
 
     @GetMapping("/v1/users")
     public ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok().body(userRepository.findAll().stream().map(it -> userConverter.convertUserEntityToDTO(it)).collect(Collectors.toList()));
+        return ResponseEntity.ok().body(userRepository.findAll().stream()
+                .filter(u -> !u.getId().equals(getUserFromContext().getId()))
+                .map(it -> userConverter.convertUserEntityToDTO(it)).collect(Collectors.toList()));
     }
 
     @GetMapping("/v1/search/{info}")
