@@ -32,6 +32,8 @@ public class PostService {
         if (post.getPictureId() != null) {
             Picture pic = pictureRepository.getById(post.getPictureId());
             postToEdit.setPicture(pic);
+        } else {
+            postToEdit.setPicture(null);
         }
         postToEdit.setSpan(objectMapper.writeValueAsString(post.getSpan()));
         postToEdit.setText(post.getText());
